@@ -15,7 +15,7 @@ class ChatData
      * @param float|null $temperature
      * @param float|null $topP
      * @param bool|null $stream
-     * @param array|null $stop
+     * @param array|string|null $stop
      * @param array|null $responseFormat
      * @param array|null $usage
      * @param array|null $tools
@@ -27,6 +27,12 @@ class ChatData
      * @param string|null $route
      * @param array|null $provider
      * @param string|null $user
+     * @param float|null $frequencyPenalty
+     * @param float|null $presencePenalty
+     * @param float|null $repetitionPenalty
+     * @param float|null $minP
+     * @param float|null $topA
+     * @param array|null $reasoning
      */
     public function __construct(
         private readonly array $messages = [],
@@ -35,18 +41,24 @@ class ChatData
         private readonly ?float $temperature = null,
         private readonly ?float $topP = null,
         private readonly ?bool $stream = null,
-        private readonly ?array $stop = null,
+        private readonly array|string|null $stop = null,
         private readonly ?array $responseFormat = null,
         private readonly ?array $usage = null,
         private readonly ?array $tools = null,
-        private readonly ?string $toolChoice = null,
+        private readonly mixed $toolChoice = null,
         private readonly ?array $logitBias = null,
         private readonly ?int $seed = null,
         private readonly ?array $transforms = null,
         private readonly ?array $models = null,
         private readonly ?string $route = null,
         private readonly ?array $provider = null,
-        private readonly ?string $user = null
+        private readonly ?string $user = null,
+        private readonly ?float $frequencyPenalty = null,
+        private readonly ?float $presencePenalty = null,
+        private readonly ?float $repetitionPenalty = null,
+        private readonly ?float $minP = null,
+        private readonly ?float $topA = null,
+        private readonly ?array $reasoning = null
     ) {
     }
 
@@ -80,7 +92,7 @@ class ChatData
         return $this->stream;
     }
 
-    public function getStop(): ?array
+    public function getStop(): array|string|null
     {
         return $this->stop;
     }
@@ -100,7 +112,7 @@ class ChatData
         return $this->tools;
     }
 
-    public function getToolChoice(): ?string
+    public function getToolChoice(): mixed
     {
         return $this->toolChoice;
     }
@@ -138,6 +150,36 @@ class ChatData
     public function getUser(): ?string
     {
         return $this->user;
+    }
+
+    public function getFrequencyPenalty(): ?float
+    {
+        return $this->frequencyPenalty;
+    }
+
+    public function getPresencePenalty(): ?float
+    {
+        return $this->presencePenalty;
+    }
+
+    public function getRepetitionPenalty(): ?float
+    {
+        return $this->repetitionPenalty;
+    }
+
+    public function getMinP(): ?float
+    {
+        return $this->minP;
+    }
+
+    public function getTopA(): ?float
+    {
+        return $this->topA;
+    }
+
+    public function getReasoning(): ?array
+    {
+        return $this->reasoning;
     }
 
     public function toArray(): array
@@ -214,6 +256,26 @@ class ChatData
         
         if ($this->user !== null) {
             $data['user'] = $this->user;
+        }
+
+        if ($this->frequencyPenalty !== null) {
+            $data['frequency_penalty'] = $this->frequencyPenalty;
+        }
+
+        if ($this->presencePenalty !== null) {
+            $data['presence_penalty'] = $this->presencePenalty;
+        }
+
+        if ($this->repetitionPenalty !== null) {
+            $data['repetition_penalty'] = $this->repetitionPenalty;
+        }
+
+        if ($this->minP !== null) {
+            $data['min_p'] = $this->minP;
+        }
+
+        if ($this->topA !== null) {
+            $data['top_a'] = $this->topA;
         }
         
         return $data;
