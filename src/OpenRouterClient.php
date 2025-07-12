@@ -63,14 +63,24 @@ class OpenRouterClient
         return ChatResponseData::fromArray($data);
     }
 
-    public function getGeneration(string $generationId, int $maxRetries = 5, int $retryDelay = 2): array
+    public function getGeneration(string $generationId, int $maxRetries = 10, int $retryDelay = 3): array
     {
-        for ($i = 0; $i < $maxRetries; $i++) {
-            $response = $this->makeRequest('GET', "/generation?id={$generationId}");
-            $generationData = json_decode($response, true);
+        sleep(1); // Initial delay before the first attempt
+        $lastException = null;
 
-            if (!empty($generationData['data']['usage'])) {
-                return $generationData;
+        for ($i = 0; $i < $maxRetries; $i++) {
+            try {
+                $response = $this->makeRequest('GET', "/generation?id={$generationId}");
+                $generationData = json_decode($response, true);
+
+                if (!empty($generationData['data']['usage'])) {
+                    return $generationData;
+                }
+            } catch (OpenRouterException $e) {
+                if (strpos($e->getMessage(), '404') === false) {
+                    throw $e;
+                }
+                $lastException = $e;
             }
 
             if ($i < $maxRetries - 1) {
@@ -78,7 +88,11 @@ class OpenRouterClient
             }
         }
 
-        return $generationData;
+        if ($lastException !== null) {
+            throw $lastException;
+        }
+
+        return [];
     }
 
     /**
@@ -88,7 +102,7 @@ class OpenRouterClient
      * @return GenerationCostData
      * @throws OpenRouterException
      */
-    public function getRequestCosts(string $generationId, int $maxRetries = 5, int $retryDelay = 2): GenerationCostData
+    public function getRequestCosts(string $generationId, int $maxRetries = 10, int $retryDelay = 3): GenerationCostData
     {
         $generationData = $this->getGeneration($generationId, $maxRetries, $retryDelay);
         
@@ -106,7 +120,7 @@ class OpenRouterClient
      * @return GenerationCostData
      * @throws OpenRouterException
      */
-    public function getChatRequestCosts(ChatResponseData $response, int $maxRetries = 5, int $retryDelay = 2): GenerationCostData
+    public function getChatRequestCosts(ChatResponseData $response, int $maxRetries = 10, int $retryDelay = 3): GenerationCostData
     {
         return $this->getRequestCosts($response->getId(), $maxRetries, $retryDelay);
     }
