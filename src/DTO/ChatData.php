@@ -187,7 +187,12 @@ class ChatData
         $data = [];
         
         if (!empty($this->messages)) {
-            $data['messages'] = array_map(fn(MessageData $message) => $message->toArray(), $this->messages);
+            $data['messages'] = array_map(function ($message) {
+                if ($message instanceof MessageData) {
+                    return $message->toArray();
+                }
+                return $message;
+            }, $this->messages);
         }
         
         if ($this->model !== null) {
