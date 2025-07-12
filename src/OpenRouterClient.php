@@ -63,10 +63,22 @@ class OpenRouterClient
         return ChatResponseData::fromArray($data);
     }
 
-    public function getGeneration(string $generationId): array
+    public function getGeneration(string $generationId, int $maxRetries = 5, int $retryDelay = 2): array
     {
-        $response = $this->makeRequest('GET', "/generation?id={$generationId}");
-        return json_decode($response, true);
+        for ($i = 0; $i < $maxRetries; $i++) {
+            $response = $this->makeRequest('GET', "/generation?id={$generationId}");
+            $generationData = json_decode($response, true);
+
+            if (!empty($generationData['data']['usage'])) {
+                return $generationData;
+            }
+
+            if ($i < $maxRetries - 1) {
+                sleep($retryDelay);
+            }
+        }
+
+        return $generationData;
     }
 
     /**
@@ -76,9 +88,9 @@ class OpenRouterClient
      * @return GenerationCostData
      * @throws OpenRouterException
      */
-    public function getRequestCosts(string $generationId): GenerationCostData
+    public function getRequestCosts(string $generationId, int $maxRetries = 5, int $retryDelay = 2): GenerationCostData
     {
-        $generationData = $this->getGeneration($generationId);
+        $generationData = $this->getGeneration($generationId, $maxRetries, $retryDelay);
         
         if (!isset($generationData['data']) || !is_array($generationData['data'])) {
             throw new OpenRouterException('Invalid generation data format from OpenRouter API');
@@ -94,9 +106,9 @@ class OpenRouterClient
      * @return GenerationCostData
      * @throws OpenRouterException
      */
-    public function getChatRequestCosts(ChatResponseData $response): GenerationCostData
+    public function getChatRequestCosts(ChatResponseData $response, int $maxRetries = 5, int $retryDelay = 2): GenerationCostData
     {
-        return $this->getRequestCosts($response->getId());
+        return $this->getRequestCosts($response->getId(), $maxRetries, $retryDelay);
     }
 
     /**
