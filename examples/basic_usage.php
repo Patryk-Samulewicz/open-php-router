@@ -8,8 +8,6 @@ use OpenPhpRouter\DTO\ChatData;
 use OpenPhpRouter\DTO\MessageData;
 use OpenPhpRouter\Enum\RoleType;
 
-// Przykład użycia - wymaga ustawienia OPENROUTER_API_KEY w zmiennych środowiskowych
-$apiKey = $_ENV['OPENROUTER_API_KEY'] ?? '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';
 
 if ($apiKey === 'your_api_key_here') {
     echo "Ustaw zmienną środowiskową OPENROUTER_API_KEY lub edytuj ten plik.\n";
@@ -49,10 +47,6 @@ try {
         );
         $count++;
     }
-
-    echo "\n=== Test ===\n";
-    $generation = $client->getGeneration('gen-1752068611-QMyQb5loRWgvVaCI5pg9');
-    $cost = GenerationCostData::fromArray($generation);
 
     echo "\n=== Szczegóły modelu ===\n";
     echo sprintf(
