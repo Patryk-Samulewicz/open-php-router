@@ -22,7 +22,7 @@ class OpenRouterClient
     public function __construct(array $config = [])
     {
         $this->apiKey = $config['api_key'] ?? throw new \InvalidArgumentException('API key is required');
-        $this->timeout = $config['timeout'] ?? 120;
+        $this->timeout = $config['timeout'] ?? 240;
         $this->referer = $config['referer'] ?? 'https://github.com/open-php-router/open-php-router';
         $this->title = $config['title'] ?? 'open-php-router';
     }
@@ -99,6 +99,8 @@ class OpenRouterClient
      * Get costs for a specific request by generation ID
      *
      * @param string $generationId
+     * @param int $maxRetries
+     * @param int $retryDelay
      * @return GenerationCostData
      * @throws OpenRouterException
      */
@@ -117,6 +119,8 @@ class OpenRouterClient
      * Get costs for a chat request using the response data
      *
      * @param ChatResponseData $response
+     * @param int $maxRetries
+     * @param int $retryDelay
      * @return GenerationCostData
      * @throws OpenRouterException
      */
