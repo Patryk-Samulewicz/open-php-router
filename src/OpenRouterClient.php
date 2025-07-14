@@ -22,7 +22,7 @@ class OpenRouterClient
     public function __construct(array $config = [])
     {
         $this->apiKey = $config['api_key'] ?? throw new \InvalidArgumentException('API key is required');
-        $this->timeout = $config['timeout'] ?? 30;
+        $this->timeout = $config['timeout'] ?? 120;
         $this->referer = $config['referer'] ?? 'https://github.com/open-php-router/open-php-router';
         $this->title = $config['title'] ?? 'open-php-router';
     }
@@ -144,6 +144,7 @@ class OpenRouterClient
             CURLOPT_URL => $url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_TIMEOUT => $this->timeout,
+            CURLOPT_CONNECTTIMEOUT => 20,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTPHEADER => [
                 'Authorization: Bearer ' . $this->apiKey,
